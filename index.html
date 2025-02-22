@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>
+    Your CV - Professional Resume &amp; Portfolio Builder
+  </title>
+  <script src="https://cdn.tailwindcss.com">
+  </script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&amp;display=swap" rel="stylesheet" />
+  <style>
+    /* Custom styles for the dropdown menu */
+    .dropdown:hover .dropdown-menu {
+      display: block;
+    }
+
+    /* Popup styles */
+    .popup-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .popup-content {
+      position: relative;
+      width: 90%;
+      height: 90%;
+      background-color: white;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .popup-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .close-popup {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: rgba(255, 255, 255, 0.8);
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 1010;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .close-popup:hover {
+      background-color: rgba(255, 255, 255, 1);
+      transform: scale(1.1);
+    }
+
+    /* Button hover effect */
+    .button-effect {
+      transition: all 0.3s ease;
+    }
+
+    .button-effect:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+  </style>
+</head>
+
+<body class="font-roboto bg-gray-50 text-gray-800">
+  <header class="bg-gradient-to-r from-blue-500 to-purple-600 shadow-lg">
+    <div class="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center">
+      <div class="text-3xl font-bold text-white mb-4 md:mb-0">
+        Your CV
+      </div>
+      <nav class="relative">
+        <div class="dropdown inline-block relative">
+          <button class="text-white font-semibold py-2 px-4 rounded inline-flex items-center">
+            <span class="mr-1">
+              Menu
+            </span>
+            <svg class="fill-current h-4 w-4" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0 0h20v20H0z" fill="none" />
+              <path d="M10 12l-6-6h12z" />
+            </svg>
+          </button>
+          <ul class="dropdown-menu absolute hidden text-gray-700 pt-1">
+            <li>
+              <a class="bg-white hover:bg-gray-200 py-2 px-4 block whitespace-no-wrap" href="#">
+                Home
+              </a>
+            </li>
+            <li>
+              <a class="bg-white hover:bg-gray-200 py-2 px-4 block whitespace-no-wrap" href="#">
+                Resume Builder
+              </a>
+            </li>
+            <li>
+              <a class="bg-white hover:bg-gray-200 py-2 px-4 block whitespace-no-wrap" href="#">
+                Portfolio Builder
+              </a>
+            </li>
+            <li>
+              <a class="bg-white hover:bg-gray-200 py-2 px-4 block whitespace-no-wrap" href="#">
+                Deployment
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+  </header>
+  <main class="container mx-auto px-4 py-12">
+    <section class="text-center mb-16">
+      <h1 class="text-5xl font-bold text-gray-800 mb-6">
+        Create Stunning Resumes and Portfolios
+      </h1>
+      <p class="text-xl text-gray-600">
+        Our tools and templates make it easy to build your professional documents and personal websites.
+      </p>
+    </section>
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
+      <div class="bg-white shadow-lg rounded-lg p-8 transform hover:scale-105 transition-transform duration-300">
+        <img alt="Illustration of a person creating a resume on a computer"
+          class="w-full h-56 object-cover rounded-md mb-6" height="400"
+          src="https://storage.googleapis.com/a1aa/image/kc0CV4zri7PKEkboGS9yQ0Wstp6vFRfiAqC0xZqnoaA.jpg" width="600" />
+        <h2 class="text-3xl font-bold text-gray-800 mb-4">
+          Resume Builder
+        </h2>
+        <p class="text-gray-600 mb-6">
+          Input your details, select from professionally designed templates, and customize your CV with different
+          layouts, fonts, and colors.
+        </p>
+        <button id="resume-btn" class="inline-block bg-blue-600 text-white px-6 py-3 rounded-md button-effect">
+          Get Started
+        </button>
+      </div>
+      <div class="bg-white shadow-lg rounded-lg p-8 transform hover:scale-105 transition-transform duration-300">
+        <img alt="Illustration of a person creating a portfolio on a computer"
+          class="w-full h-56 object-cover rounded-md mb-6" height="400"
+          src="https://storage.googleapis.com/a1aa/image/ntdOG0WOO7d22qLwogVrXSiElUaR5wfAdJfN26jjNxk.jpg" width="600" />
+        <h2 class="text-3xl font-bold text-gray-800 mb-4">
+          Portfolio Builder
+        </h2>
+        <p class="text-gray-600 mb-6">
+          Create your own portfolio website with pre-made templates. Add sections like "About Me," "Projects," "Skills,"
+          and "Contact."
+        </p>
+        <button id="portfolio-btn" class="inline-block bg-purple-600 text-white px-6 py-3 rounded-md button-effect">
+          Get Started
+        </button>
+      </div>
+    </section>
+    <section class="bg-white shadow-lg rounded-lg p-8 mb-16">
+      <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">
+        Features
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="flex items-start">
+          <i class="fas fa-check-circle text-green-500 text-2xl mr-4">
+          </i>
+          <div>
+            <h3 class="text-xl font-semibold text-gray-800">
+              Professionally designed templates
+            </h3>
+            <p class="text-gray-600">
+              Choose from a variety of professionally designed templates to create your resume or portfolio.
+            </p>
+          </div>
+        </div>
+        <div class="flex items-start">
+          <i class="fas fa-check-circle text-green-500 text-2xl mr-4">
+          </i>
+          <div>
+            <h3 class="text-xl font-semibold text-gray-800">
+              Customizable layouts, fonts, and colors
+            </h3>
+            <p class="text-gray-600">
+              Personalize your documents with customizable layouts, fonts, and colors to match your style.
+            </p>
+          </div>
+        </div>
+        <div class="flex items-start">
+          <i class="fas fa-check-circle text-green-500 text-2xl mr-4">
+          </i>
+          <div>
+            <h3 class="text-xl font-semibold text-gray-800">
+              Real-time editing capabilities
+            </h3>
+            <p class="text-gray-600">
+              Edit your resume or portfolio in real-time and see the changes instantly.
+            </p>
+          </div>
+        </div>
+        <div class="flex items-start">
+          <i class="fas fa-check-circle text-green-500 text-2xl mr-4">
+          </i>
+          <div>
+            <h3 class="text-xl font-semibold text-gray-800">
+              One-click "Deploy" button for portfolios
+            </h3>
+            <p class="text-gray-600">
+              Deploy your portfolio website with a single click and share it with the world.
+            </p>
+          </div>
+        </div>
+        <div class="flex items-start">
+          <i class="fas fa-check-circle text-green-500 text-2xl mr-4">
+          </i>
+          <div>
+            <h3 class="text-xl font-semibold text-gray-800">
+              Export resumes as PDFs
+            </h3>
+            <p class="text-gray-600">
+              Export your resume as a PDF file for easy sharing and printing.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Popup containers -->
+  <div id="resume-popup" class="popup-overlay">
+    <div class="popup-content">
+      <div class="close-popup">
+        <i class="fas fa-times"></i>
+      </div>
+      <iframe src="resume.html" class="popup-iframe" title="Resume Builder"></iframe>
+    </div>
+  </div>
+
+  <div id="portfolio-popup" class="popup-overlay">
+    <div class="popup-content">
+      <div class="close-popup">
+        <i class="fas fa-times"></i>
+      </div>
+      <iframe src="Portfolio.html" class="popup-iframe" title="Portfolio Builder"></iframe>
+    </div>
+  </div>
+
+  <footer class="bg-gradient-to-r from-blue-500 to-purple-600 shadow-lg mt-16">
+    <div class="container mx-auto px-4 py-6 text-center">
+      <p class="text-white">
+        © 2023 Your CV. All rights reserved.
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    // Popup functionality
+    document.getElementById('resume-btn').addEventListener('click', function () {
+      document.getElementById('resume-popup').style.display = 'flex';
+      document.body.style.overflow = 'hidden'; // Prevent scrolling when popup is open
+    });
+
+    document.getElementById('portfolio-btn').addEventListener('click', function () {
+      document.getElementById('portfolio-popup').style.display = 'flex';
+      document.body.style.overflow = 'hidden'; // Prevent scrolling when popup is open
+    });
+
+    // Close popup functionality
+    document.querySelectorAll('.close-popup').forEach(function (closeBtn) {
+      closeBtn.addEventListener('click', function () {
+        document.querySelectorAll('.popup-overlay').forEach(function (popup) {
+          popup.style.display = 'none';
+        });
+        document.body.style.overflow = 'auto'; // Re-enable scrolling
+      });
+    });
+
+    // Close popup when clicking outside content
+    document.querySelectorAll('.popup-overlay').forEach(function (overlay) {
+      overlay.addEventListener('click', function (e) {
+        if (e.target === this) {
+          this.style.display = 'none';
+          document.body.style.overflow = 'auto'; // Re-enable scrolling
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>
