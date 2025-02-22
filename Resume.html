@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Your CV - Resume Builder</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f9fafb;
+            color: #1f2937;
+        }
+        
+        .header-gradient {
+            background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
+        }
+        
+        /* Dropdown styling */
+        .dropdown:hover .dropdown-menu {
+            display: block;
+        }
+        
+        /* Rearrange mode styling */
+        .rearrange-mode .section-container {
+            cursor: move;
+            border: 2px dashed #ccc;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            transition: background-color 0.3s;
+        }
+        
+        .rearrange-mode .section-container:hover {
+            background-color: #f0f9ff;
+        }
+        
+        .delete-btn {
+            color: #ef4444;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+        
+        .input-group-append .delete-btn {
+            padding: 0.375rem 0.75rem;
+            background-color: #fff;
+            border: 1px solid #ced4da;
+            border-left: none;
+        }
+        
+        .sticky-navbar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        /* Print styles */
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            header, footer, aside, .no-print {
+                display: none; /* Hide header, footer, and sidebar when printing */
+            }
+            main {
+                width: 100%; /* Make main content full width */
+                padding: 0; /* Remove padding */
+            }
+            #branding-text {
+                display: block; /* Ensure branding text is displayed */
+            }
+        }
+    </style>
+</head>
+<body>
+<header class="header-gradient shadow-lg sticky-navbar">
+    <div class="container py-3">
+        <div class="row align-items-center">
+            <div class="col-md-6 mb-2 mb-md-0">
+                <div class="h3 fw-bold text-white"> Your CV </div>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <nav class="dropdown d-inline-block">
+                    <button class="btn text-white dropdown-toggle" type="button" id="menuDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        Menu
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="menuDropdown">
+                        <li><a class="dropdown-item" href="#">Home</a></li>
+                        <li><a class="dropdown-item" href="#">Resume Builder</a></li>
+                        <li><a class="dropdown-item" href="#">Portfolio Builder</a></li>
+                        <li><a class="dropdown-item" href="#">Deployment</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="container py-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 mb-4">
+            <div class="card p-3">
+                <div class="d-flex d-md-none justify-content-between mb-3">
+                    <ul class="list-unstyled mb-0">
+                        <li class="d-flex align-items-center py-2">
+                            <i class="fas fa-plus me-2"></i>
+                            <a href="#" class="text-decoration-none text-secondary" onclick="addSection()">Add section</a>
+                        </li>
+                        <li class="d-flex align-items-center py-2">
+                            <i class="fas fa-arrows-alt me-2"></i>
+                            <a href="#" class="text-decoration-none text-secondary" onclick="toggleRearrangeMode()">Rearrange</a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="d-none d-md-block">
+                    <ul class="list-unstyled">
+                        <li class="d-flex align-items-center py-2">
+                            <i class="fas fa-plus me-2"></i>
+                            <a href="#" class="text-decoration-none text-secondary" onclick="addSection()">Add section</a>
+                        </li>
+                        <li class="d-flex align-items-center py-2">
+                            <i class="fas fa-arrows-alt me-2"></i>
+                            <a href="#" class="text-decoration-none text-secondary" onclick="toggleRearrangeMode()">Rearrange</a>
+                        </li>
+                        <li class="d-flex align-items-center py-2">
+                            <i class="fas fa-crown me-2"></i>
+                            <span class="text-secondary">Branding</span>
+                            <input type="checkbox" class="ms-2" checked onchange="toggleBranding(this)"/>
+                        </li>
+                    </ul>
+                    <button class="btn btn-primary w-100 mt-3" onclick="generatePDF()">Download</button>
+                </div>
+                
+                <!-- Rearrange mode controls (hidden by default) -->
+                <div id="rearrangeControls" class="mt-4 d-none">
+                    <p class="small text-secondary mb-2">Drag sections to reorder them</p>
+                    <button id="saveRearrangement" class="btn btn-success w-100 mb-2">Save Order</button>
+                    <button id="cancelRearrangement" class="btn btn-danger w-100">Cancel</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Resume Preview -->
+        <div class="col-md-9">
+            <div class="card p-4" id="resumeContent">
+                <!-- Header Information -->
+                <div class="section-container text-center mb-4" data-section="header">
+                    <input type="text" class="form-control form-control-lg fw-bold text-center mb-2" placeholder="YOUR NAME" required/>
+                    <input type="text" class="form-control text-center mb-2" placeholder="The role you are applying for?" required/>
+                    <div class="row">
+                        <div class="col-md-4 mb-2">
+                            <input type="text" class="form-control" placeholder="Email" required/>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <input type="text" class="form-control" placeholder="LinkedIn/Portfolio" required/>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <input type="text" class="form-control" placeholder="Location" required/>
+                        </div>
+                    </div>
+                </div>
+                <hr class="my-4"/>
+                
+                <!-- Summary Section -->
+                <div class="section-container mb-4" data-section="summary">
+                    <h2 class="h4 fw-bold">Summary</h2>
+                    <textarea class="form-control" rows="3" placeholder="Briefly explain why you're a great fit for this role."></textarea>
+                </div>
+                <hr class="my-4"/>
+                
+                <!-- Experience Section -->
+                <div class="section-container mb-4" data-section="experience">
+                    <h2 class="h4 fw-bold">Experience</h2>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <input type="text" class="form-control fw-bold mb-2" placeholder="Company Name"/>
+                            <input type="text" class="form-control mb-2" placeholder="Title"/>
+                            <input type="text" class="form-control mb-2" placeholder="Company Description"/>
+                            <textarea class="form-control" rows="3" placeholder="Highlight your accomplishments."></textarea>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <input type="text" class="form-control mb-2" placeholder="Location"/>
+                            <input type="text" class="form-control date-picker" placeholder="Date period"/>
+                        </div>
+                    </div>
+                </div>
+                <hr class="my-4"/>
+                
+                <!-- Education Section -->
+                <div class="section-container mb-4" data-section="education">
+                    <h2 class="h4 fw-bold">Education</h2>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <input type="text" class="form-control fw-bold mb-2" placeholder="School or University"/>
+                            <input type="text" class="form-control" placeholder="Degree and Field of Study"/>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <input type="text" class="form-control date-picker" placeholder="Date period"/>
+                        </div>
+                    </div>
+                </div>
+                <hr class="my-4"/>
+                
+                <!-- Key Achievements Section -->
+                <div class="section-container mb-4" data-section="achievements">
+                    <h2 class="h4 fw-bold">Key Achievements</h2>
+                    <div>
+                        <input type="text" class="form-control fw-bold mb-2" placeholder="Your Achievement"/>
+                        <textarea class="form-control" rows="3" placeholder="Describe what you did and the impact it had."></textarea>
+                    </div>
+                </div>
+                <hr class="my-4"/>
+                
+                <!-- Skills Section -->
+                <div class="section-container mb-4" data-section="skills">
+                    <h2 class="h4 fw-bold d-flex align-items-center">
+                        Skills 
+                        <button class="btn btn-sm text-primary ms-2" onclick="addSkill()">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </h2>
+                    <div id="skills-container">
+                        <div class="input-group mb-2">
+                            <input type="text" class="form-control" placeholder="Your Skill"/>
+                            <div class="input-group-append">
+                                <span class="delete-btn" onclick="deleteInput(this)">
+                                    <i class="fas fa-minus"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr class="my-4"/>
+                
+                <!-- Certification Section -->
+                <div class="section-container mb-4" data-section="certification">
+                    <h2 class="h4 fw-bold d-flex align-items-center">
+                        Certification 
+                        <button class="btn btn-sm text-primary ms-2" onclick="addCertification()">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </h2>
+                    <div id="certification-container">
+                        <div class="input-group mb-2">
+                            <input type="text" class="form-control fw-bold" placeholder="Course Title"/>
+                            <div class="input-group-append">
+                                <span class="delete-btn" onclick="deleteInput(this)">
+                                    <i class="fas fa-minus"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr class="my-4"/>
+                
+                <!-- Projects Section -->
+                <div class="section-container mb-4" data-section="projects">
+                    <h2 class="h4 fw-bold d-flex align-items-center">
+                        Projects 
+                        <button class="btn btn-sm text-primary ms-2" onclick="addProject()">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </h2>
+                    <div id="projects-container">
+                        <div class="project-entry mb-4">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <input type="text" class="form-control fw-bold mb-2" placeholder="Project Name"/>
+                                    <textarea class="form-control mb-2" rows="2" placeholder="Short summary of your work"></textarea>
+                                    <textarea class="form-control" rows="2" placeholder="What was a successful outcome of your work?"></textarea>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex">
+                                        <input type="text" class="form-control mb-2" placeholder="Location"/>
+                                        <div class="input-group-append">
+                                            <span class="delete-btn" onclick="deleteProject(this)">
+                                                <i class="fas fa-minus"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <input type="text" class="form-control date-picker" placeholder="Date period"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr class="my-4"/>
+                
+                <!-- Branding Text -->
+                <div class="text-center text-secondary" id="branding-text">
+                    Your CV by Aristo A and Christo Francis
+                </div>
+                
+                <!-- Mobile-only buttons at bottom -->
+                <div class="d-md-none mt-4">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" checked id="mobileBranding" onchange="toggleBranding(this)">
+                            <label class="form-check-label" for="mobileBranding">
+                                Branding
+                            </label>
+                        </div>
+                        <button class="btn btn-primary" onclick="generatePDF()">Download</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer class="header-gradient mt-5 py-4">
+    <div class="container">
+        <div class="text-center text-white">
+            <p>© 2023 Your CV. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize date pickers
+        initializeDatePickers();
+    });
+
+    // Initialize all date pickers
+    function initializeDatePickers() {
+        flatpickr(".date-picker", {
+            mode: "range",
+            dateFormat: "M Y",
+            altFormat: "F Y",
+            allowInput: true,
+            showMonths: 1,
+            static: true
+        });
+    }
+
+    // ----- Delete functionality -----
+    function deleteInput(element) {
+        const parentDiv = element.closest('.input-group');
+        if (parentDiv) {
+            // Check if this is the only element in the container
+            const container = parentDiv.parentNode;
+            if (container.children.length > 1) {
+                parentDiv.remove();
+            } else {
+                // If it's the last element, just clear the value
+                parentDiv.querySelector('input').value = '';
+            }
+        }
+    }
+    
+    function deleteProject(element) {
+        const projectEntry = element.closest('.project-entry');
+        const container = document.getElementById('projects-container');
+        
+        if (container.children.length > 1) {
+            projectEntry.remove();
+        } else {
+            // Clear values instead of removing if it's the last one
+            projectEntry.querySelectorAll('input, textarea').forEach(input => {
+                input.value = '';
+            });
+        }
+    }
+
+    // ----- Add section functions -----
+    function addSkill() {
+        const container = document.getElementById('skills-container');
+        const inputGroup = document.createElement('div');
+        inputGroup.className = 'input-group mb-2';
+        inputGroup.innerHTML = `
+            <input type="text" class="form-control" placeholder="Your Skill"/>
+            <div class="input-group-append">
+                <span class="delete-btn" onclick="deleteInput(this)">
+                    <i class="fas fa-minus"></i>
+                </span>
+            </div>
+        `;
+        container.appendChild(inputGroup);
+    }
+
+    function addCertification() {
+        const container = document.getElementById('certification-container');
+        const inputGroup = document.createElement('div');
+        inputGroup.className = 'input-group mb-2';
+        inputGroup.innerHTML = `
+            <input type="text" class="form-control fw-bold" placeholder="Course Title"/>
+            <div class="input-group-append">
+                <span class="delete-btn" onclick="deleteInput(this)">
+                    <i class="fas fa-minus"></i>
+                </span>
+            </div>
+        `;
+        container.appendChild(inputGroup);
+    }
+
+    function addProject() {
+        const container = document.getElementById('projects-container');
+        const templateProject = document.querySelector('.project-entry');
+        const newProject = templateProject.cloneNode(true);
+        
+        // Clear input values in the clone
+        newProject.querySelectorAll('input, textarea').forEach(input => {
+            input.value = '';
+        });
+        
+        // Reinitialize date picker in the new project
+        container.appendChild(newProject);
+        initializeDatePickers();
+    }
+
+    // ----- Rearrange functionality -----
+    let inRearrangeMode = false;
+    let originalOrder = [];
+
+    function toggleRearrangeMode() {
+        const resumeContent = document.getElementById('resumeContent');
+        const rearrangeControls = document.getElementById('rearrangeControls');
+        inRearrangeMode = !inRearrangeMode;
+        
+        if (inRearrangeMode) {
+            // Enter rearrange mode
+            resumeContent.classList.add('rearrange-mode');
+            rearrangeControls.classList.remove('d-none');
+            
+            // Save original order
+            const sections = document.querySelectorAll('.section-container');
+            originalOrder = Array.from(sections).map(section => section.dataset.section);
+            
+            // Make sections draggable
+            enableDragging();
+        } else {
+            // Exit rearrange mode
+            resumeContent.classList.remove('rearrange-mode');
+            rearrangeControls.classList.add('d-none');
+            disableDragging();
+        }
+    }
+
+    function enableDragging() {
+        const sections = document.querySelectorAll('.section-container');
+        sections.forEach(section => {
+            section.setAttribute('draggable', 'true');
+            section.addEventListener('dragstart', handleDragStart);
+            section.addEventListener('dragover', handleDragOver);
+            section.addEventListener('drop', handleDrop);
+            section.addEventListener('dragend', handleDragEnd);
+        });
+    }
+
+    function disableDragging() {
+        const sections = document.querySelectorAll('.section-container');
+        sections.forEach(section => {
+            section.removeAttribute('draggable');
+            section.removeEventListener('dragstart', handleDragStart);
+            section.removeEventListener('dragover', handleDragOver);
+            section.removeEventListener('drop', handleDrop);
+            section.removeEventListener('dragend', handleDragEnd);
+        });
+    }
+
+    // Draggable element functions
+    let draggedElement = null;
+
+    function handleDragStart(e) {
+        draggedElement = this;
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/html', this.innerHTML);
+    }
+
+    function handleDragOver(e) {
+        if (e.preventDefault) {
+            e.preventDefault();
+        }
+        e.dataTransfer.dropEffect = 'move';
+        return false;
+    }
+
+    function handleDrop(e) {
+        if (e.stopPropagation) {
+            e.stopPropagation();
+        }
+        
+        if (draggedElement !== this) {
+            // Get parent container
+            const parent = this.parentNode;
+            
+            // Get the positions
+            const allSections = Array.from(document.querySelectorAll('.section-container'));
+            const fromIndex = allSections.indexOf(draggedElement);
+            const toIndex = allSections.indexOf(this);
+            
+            // Perform the actual reordering
+            if (fromIndex < toIndex) {
+                parent.insertBefore(draggedElement, this.nextSibling);
+            } else {
+                parent.insertBefore(draggedElement, this);
+            }
+        }
+        
+        return false;
+    }
+
+    function handleDragEnd() {
+        draggedElement = null;
+    }
+
+    // Save and cancel rearrangement
+    document.getElementById('saveRearrangement').addEventListener('click', function() {
+        // Confirm the rearrangement and exit rearrange mode
+        toggleRearrangeMode();
+        
+        // Show success message
+        alert('Resume section order has been saved!');
+    });
+
+    document.getElementById('cancelRearrangement').addEventListener('click', function() {
+        // Restore original order
+        const resumeContent = document.getElementById('resumeContent');
+        const sections = Array.from(document.querySelectorAll('.section-container'));
+        
+        // Sort based on original order
+        sections.sort((a, b) => {
+            return originalOrder.indexOf(a.dataset.section) - originalOrder.indexOf(b.dataset.section);
+        });
+        
+        // Re-append in original order
+        sections.forEach(section => {
+            resumeContent.appendChild(section);
+        });
+        
+        // Exit rearrange mode
+        toggleRearrangeMode();
+    });
+
+    function addSection() {
+        // This could show a modal with available sections to add
+        const sections = [
+            'References', 
+            'Languages', 
+            'Publications', 
+            'Volunteer Experience'
+        ];
+        
+        const selectedSection = prompt(
+            'Which section would you like to add?\n\n' + 
+            sections.join('\n')
+        );
+        
+        if (selectedSection && sections.includes(selectedSection)) {
+            // Create and add the selected section
+            const newSection = document.createElement('div');
+            newSection.className = 'section-container mb-4';
+            newSection.dataset.section = selectedSection.toLowerCase().replace(' ', '-');
+            
+            newSection.innerHTML = `
+                <h2 class="h4 fw-bold">${selectedSection}</h2>
+                <textarea class="form-control" rows="3" placeholder="Add your ${selectedSection.toLowerCase()} details here..."></textarea>
+            `;
+            
+            // Insert before the branding text
+            const brandingText = document.getElementById('branding-text');
+            document.getElementById('resumeContent').insertBefore(newSection, brandingText.previousElementSibling);
+            document.getElementById('resumeContent').insertBefore(document.createElement('hr'), brandingText.previousElementSibling);
+            document.getElementById('resumeContent').lastElementChild.className = 'my-4';
+        }
+    }
+
+    function toggleBranding(checkbox) {
+        const brandingText = document.getElementById('branding-text');
+        // Sync the other checkbox if exists
+        const mobileCheck = document.getElementById('mobileBranding');
+        const desktopCheck = checkbox.id === 'mobileBranding' ? document.querySelector('input[onchange="toggleBranding(this)"]') : null;
+        
+        if (checkbox.checked) {
+            brandingText.textContent = "Your CV by Aristo A and Christo Francis";
+            if (mobileCheck && checkbox !== mobileCheck) mobileCheck.checked = true;
+            if (desktopCheck) desktopCheck.checked = true;
+        } else {
+            brandingText.textContent = "";
+            if (mobileCheck && checkbox !== mobileCheck) mobileCheck.checked = false;
+            if (desktopCheck) desktopCheck.checked = false;
+        }
+    }
+
+    function generatePDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        // Collecting data from the form
+        const name = document.querySelector('input[placeholder="YOUR NAME"]').value;
+        const role = document.querySelector('input[placeholder="The role you are applying for?"]').value;
+        const email = document.querySelector('input[placeholder="Email"]').value;
+        const linkedIn = document.querySelector('input[placeholder="LinkedIn/Portfolio"]').value;
+        const location = document.querySelector('input[placeholder="Location"]').value;
+
+        // Check for mandatory fields
+        if (!name || !role || !email || !linkedIn || !location) {
+            alert("Please fill in all mandatory fields: Name, Role, Email, LinkedIn/Portfolio, and Location.");
+            return;
+        }
+
+        // Adding content to the PDF
+        doc.setFontSize(16);
+        doc.text(name, 105, 20, { align: 'center' });
+        doc.setFontSize(12);
+        doc.text(role, 105, 30, { align: 'center' });
+        
+        // Contact information line
+        const contactInfo = `${email} • ${linkedIn} • ${location}`;
+        doc.setFontSize(10);
+        doc.text(contactInfo, 105, 40, { align: 'center' });
+        doc.line(10, 45, 200, 45);
+
+        // Collect all sections in their current order
+        const sections = document.querySelectorAll('.section-container');
+        let yPos = 50;
+        
+        sections.forEach(section => {
+            if (section.dataset.section === 'header') return; // Skip header section as we've already added it
+            
+            const sectionTitle = section.querySelector('h2').textContent.trim();
+            doc.setFontSize(12);
+            doc.text(sectionTitle, 10, yPos);
+            yPos += 10;
+            
+            // Add section content based on inputs and textareas
+            const inputs = section.querySelectorAll('input:not([type="hidden"])');
+            const textareas = section.querySelectorAll('textarea');
+            
+            inputs.forEach(input => {
+                if (input.value && !input.classList.contains('date-picker')) {
+                    doc.setFontSize(10);
+                    doc.text(`${input.placeholder}: ${input.value}`, 10, yPos);
+                    yPos += 10;
+                }
+            });
+            
+            textareas.forEach(textarea => {
+                if (textarea.value) {
+                    doc.setFontSize(10);
+                    const lines = doc.splitTextToSize(textarea.value, 180);
+                    doc.text(lines, 10, yPos);
+                    yPos += 6 * lines.length;
+                }
+            });
+            
+            // Add a separator line
+            doc.line(10, yPos, 200, yPos);
+            yPos += 10;
+        });
+        
+        // Branding text
+        const brandingText = document.getElementById('branding-text').textContent;
+        if (brandingText) {
+            doc.text(brandingText, 105, 280, { align: 'center' });
+        }
+
+        // Save the PDF
+        doc.save('resume.pdf');
+    }
+</script>
+</body>
+</html>
