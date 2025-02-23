@@ -77,6 +77,78 @@
       transform: translateY(-3px);
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
     }
+
+    /* Dark theme styles */
+    body.dark {
+      background-color: #1a1a1a !important;
+      color: #ffffff;
+    }
+
+    .dark .bg-gray-50 {
+      background-color: #1a1a1a !important;
+    }
+
+    .dark .bg-white {
+      background-color: #2d2d2d !important;
+    }
+
+    .dark .text-gray-800 {
+      color: #ffffff !important;
+    }
+
+    .dark .text-gray-600 {
+      color: #d1d1d1 !important;
+    }
+
+    .dark .shadow-lg {
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    }
+
+    .dark .dropdown-menu {
+      background-color: #2d2d2d;
+    }
+
+    .dark .dropdown-menu a {
+      color: #ffffff;
+      background-color: #2d2d2d;
+    }
+
+    .dark .dropdown-menu a:hover {
+      background-color: #3d3d3d;
+    }
+
+    /* Theme toggle button styles */
+    .theme-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1000;
+      padding: 12px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background-color: #4a5568;
+      color: white;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .theme-toggle:hover {
+      transform: scale(1.1);
+    }
+
+    /* Dark theme popup styles */
+    .dark .popup-content {
+      background-color: #2d2d2d;
+    }
+
+    .dark .close-popup {
+      background-color: rgba(45, 45, 45, 0.8);
+      color: #ffffff;
+    }
+
+    .dark .close-popup:hover {
+      background-color: rgba(45, 45, 45, 1);
+    }
   </style>
 </head>
 
@@ -123,6 +195,12 @@
       </nav>
     </div>
   </header>
+
+  <!-- Theme toggle button -->
+  <button class="theme-toggle" id="theme-toggle">
+    <i class="fas fa-moon"></i>
+  </button>
+
   <main class="container mx-auto px-4 py-12">
     <section class="text-center mb-16">
       <h1 class="text-5xl font-bold text-gray-800 mb-6">
@@ -261,33 +339,57 @@
   </footer>
 
   <script>
-    // Popup functionality
+    // Theme toggle functionality
+    const themeToggle = document.getElementById('theme-toggle');
+    const body = document.body;
+    const moonIcon = '<i class="fas fa-moon"></i>';
+    const sunIcon = '<i class="fas fa-sun"></i>';
+
+    // Check for saved theme preference
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      body.classList.add('dark');
+      themeToggle.innerHTML = sunIcon;
+    }
+
+    themeToggle.addEventListener('click', () => {
+      body.classList.toggle('dark');
+      
+      // Update icon and save preference
+      if (body.classList.contains('dark')) {
+        themeToggle.innerHTML = sunIcon;
+        localStorage.setItem('theme', 'dark');
+      } else {
+        themeToggle.innerHTML = moonIcon;
+        localStorage.setItem('theme', 'light');
+      }
+    });
+
+    // Existing popup functionality
     document.getElementById('resume-btn').addEventListener('click', function () {
       document.getElementById('resume-popup').style.display = 'flex';
-      document.body.style.overflow = 'hidden'; // Prevent scrolling when popup is open
+      document.body.style.overflow = 'hidden';
     });
 
     document.getElementById('portfolio-btn').addEventListener('click', function () {
       document.getElementById('portfolio-popup').style.display = 'flex';
-      document.body.style.overflow = 'hidden'; // Prevent scrolling when popup is open
+      document.body.style.overflow = 'hidden';
     });
 
-    // Close popup functionality
     document.querySelectorAll('.close-popup').forEach(function (closeBtn) {
       closeBtn.addEventListener('click', function () {
         document.querySelectorAll('.popup-overlay').forEach(function (popup) {
           popup.style.display = 'none';
         });
-        document.body.style.overflow = 'auto'; // Re-enable scrolling
+        document.body.style.overflow = 'auto';
       });
     });
 
-    // Close popup when clicking outside content
     document.querySelectorAll('.popup-overlay').forEach(function (overlay) {
       overlay.addEventListener('click', function (e) {
         if (e.target === this) {
           this.style.display = 'none';
-          document.body.style.overflow = 'auto'; // Re-enable scrolling
+          document.body.style.overflow = 'auto';
         }
       });
     });
